@@ -1,0 +1,219 @@
+﻿@page
+@model TMS.Pages.Admin.Task.DetailsModel
+@using TMS.Utility
+@{
+    ViewData["Title"] = "Details";
+}
+
+<div class="">
+    <form method="post">
+        <input type="hidden" asp-for="TaskObj.Task.Id" />
+        <input type="hidden" asp-for="TaskObj.Task" />
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="container backgroundWhite">
+            <div class="card">
+                <div class="card-header bg-light text-light ml-0 row container">
+                    <div class="col-12 col-md-6">
+                        <h3 class="text-secondary"><strong>Details:</strong> @Model.TaskObj.Task.Name</h3>
+                    </div>
+                    <div class="col-12 col-md-6 text-md-right">
+                        @if (Model.TaskObj.Task.TotalOfHours > 0)
+                        {
+                            <h3 class="text-muted"> @((Model.TaskObj.Task.TotalOfHours).ToString() + " hours")</h3>
+                        }
+                        else
+                        {
+                            <h3 class="text-muted"> @((Model.TaskObj.Task.TotalOfHours).ToString() + " hour")</h3>
+                        }
+
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="container rounded p-2">
+                        <div class="row">
+                            <div class="col-12 col-lg-8">
+                                <div class="row">
+
+                                    <div class="col-12">
+
+                                        <div class="form-group row">
+                                            <div class="col-3">
+                                                <label asp-for="TaskObj.Task.Description"></label>
+                                            </div>
+                                            <div class="col-9">
+                                                <textarea class="form-control" asp-for="TaskObj.Task.Description" id="txtDesc" style="height:80px;" readonly></textarea>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group row">
+                                            <div class="col-3">
+                                                <label asp-for="TaskObj.Task.RequestDate"></label>
+                                            </div>
+                                            <div class="col-9">
+                                                <input class="form-control" id="datepicker" value="@Model.TaskObj.Task.RequestDate.ToShortDateString()" type="text" asp-for="TaskObj.Task.RequestDate" data-val="true" readonly/>
+                                                <span class="text-danger" asp-validation-for="TaskObj.Task.RequestDate"></span>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group row">
+                                            <div class="col-3">
+                                                <label asp-for="TaskObj.Task.Customer"></label>
+                                            </div>
+                                            <div class="col-9">
+                                                <input class="form-control" asp-for="TaskObj.Task.Customer" readonly/>
+                                                <span class="text-danger" asp-validation-for="TaskObj.Task.Customer"></span>
+                                            </div>
+                                        </div>
+
+
+                                        <div class="form-group row">
+                                            <div class="col-3">
+                                                <label asp-for="TaskObj.Task.UserId"></label>
+                                            </div>
+                                            <div class="col-9">
+                                                <input class="form-control" asp-for="TaskObj.Task.ApplicationUser.FullName" readonly/>
+                                                <span class="text-danger" asp-validation-for="TaskObj.Task.ApplicationUser.FullName"></span>
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <div class="col-12 col-lg-4 p-1 text-center">
+                                <span class="badge badge-primary">@Model.TaskObj.Task.Priority.Name</span>
+                                <span class="badge badge-warning">@Model.TaskObj.Task.Status</span>
+
+                                <div class="col pt-5">
+                                    @if (Model.TaskObj.Task.Status == Constant.StatusStarted)
+                                    {
+                                        <div class="pt-3">
+                                            <button type="submit" asp-page-handler="Progress" class="btn btn-warning btn-square form-control btn-lg" style="height:35px;width:200px;font-size:14px;">@Constant.StatusInProgress</button>
+                                        </div>
+                                    }
+
+                                    <div class="pt-3">
+                                        <a asp-page="Index" class="btn btn-success btn-square form-control btn-lg" style="height:35px;width:200px;font-size:14px;">Back to List</a>
+                                    </div>
+
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-footer">
+
+                    <div class="row pt-3">
+                        <div class="col-6">
+                            <h4 class="text-secondary">Workday List</h4>
+                        </div>
+                        <div class="col-6 text-right pt-2">
+                            <a asp-page="Workday" asp-route-taskId="@Model.TaskObj.Task.Id" asp-route-id="" class="btn btn-secondary"><i class="fas fa-fa-plus"></i> &nbsp; Add Day</a>
+                        </div>
+                    </div>
+                    <br /><br />
+                    <table id="DT_load" class="table table-striped table-bordered" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th>Day</th>
+                                <th>Date</th>
+                                <th>No Hours</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+@section Scripts{
+
+    <script>
+
+        var dataTable;
+
+        $(document).ready(function () {
+            loadList();
+        });
+
+        function loadList() {
+            var url = "/api/workday?id=" + @Model.TaskObj.Task.Id;
+            dataTable = $('#DT_load').DataTable({
+                "ajax": {
+                    "url": url,
+                    "type": "GET",
+                    "datatype": "json"
+                },
+                "columns": [
+                    { "data": "date", "width": "30%" },
+                    { "data": "day", "width": "25%" },
+                    { "data": "hours", "width": "15%" },
+                    {
+                        "data": "id",
+                        "render": function (data) {
+                            return ` <div class="text-center">
+                                <a href="/Admin/Task/workday?id=${data}" class="btn btn-success text-white" style="cursor:pointer; width:100px;">
+                                    <i class="far fa-edit"></i> Edit
+                                </a>
+                                <a class="btn btn-danger text-white" style="cursor:pointer; width:100px;" onclick=Delete('/api/workday/'+${data})>
+                                    <i class="far fa-trash-alt"></i> Delete
+                                </a>
+                    </div>`;
+                        }, "width": "30%"
+                    }
+                ],
+                "language": {
+                    "emptyTable": "no data found."
+                },
+                "width": "100%"
+            });
+        }
+
+        function Delete(url) {
+            swal({
+                title: "Are you sure you want to Delete?",
+                text: "You will not be able to restore the data!",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true
+            }).then((willDelete) => {
+                if (willDelete) {
+                    $.ajax({
+                        type: 'DELETE',
+                        url: url,
+                        success: function (data) {
+                            if (data.success) {
+                                toastr.success(data.message);
+                                dataTable.ajax.reload();
+                            }
+                            else {
+                                toastr.error(data.message);
+                            }
+                        }
+                    });
+                }
+            });
+        }
+
+    </script>
+
+    <script>
+
+        tinymce.init({
+            selector: 'textarea',
+            plugins: "lists",
+            menubar: 'file edit format'
+        });
+
+    </script>
+
+}

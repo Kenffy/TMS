@@ -1,0 +1,138 @@
+﻿@page
+@model TMS.Pages.Admin.Task.WorkdayModel
+
+<form method="post" asp-action="Upsert">
+    <div class="container">
+        <div class="row px-2 mx-2 backgroundWhite border">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="DayObj.TaskId" />
+            @{
+                var requestedate = Model.DayObj.Task.RequestDate;
+                var currentdate = DateTime.Today;
+            }
+            @if (Model.DayObj.Id != 0)
+            {
+                <input type="hidden" asp-for="DayObj.Id" />
+            }
+
+            <div class="col-12 px-3" style="border-bottom:1px solid #325d88">
+                <h2 class="text-secondary">@(Model.DayObj.Id != 0 ? "Update" : "Add") Workday</h2>
+            </div>
+
+            <div class="col-8 pt-3">
+
+                <div class="form-group row">
+                    <div class="col-3">
+                        <label asp-for="@requestedate"></label>
+                    </div>
+                    <div class="col-9">
+                        <input id="requestdate" class="form-control" asp-for="@requestedate" readonly />
+                        <span class="text-danger" asp-validation-for="@requestedate"></span>
+                    </div>
+                </div>
+
+                @if (Model.DayObj.Id != 0)
+                {
+                    <div class="form-group row">
+                        <div class="col-3">
+                            <label asp-for="DayObj.Day"></label>
+                        </div>
+                        <div class="col-9">
+                            <input class="form-control" asp-for="DayObj.Day" readonly />
+                            <span class="text-danger" asp-validation-for="DayObj.Day"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <div class="col-3">
+                            <label asp-for="DayObj.Date"></label>
+                        </div>
+                        <div class="col-9">
+                            <input class="form-control" id="datepicker" value="@Model.DayObj.Date.ToShortDateString()" type="text" asp-for="DayObj.Date" data-val="true" />
+                            <span class="text-danger" asp-validation-for="DayObj.Date"></span>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="form-group row">
+                        <div class="col-3">
+                            <label asp-for="DayObj.Date"></label>
+                        </div>
+                        <div class="col-9">
+                            <input class="form-control" id="datepicker" value="@currentdate.ToShortDateString()" type="text" asp-for="DayObj.Date" data-val="true" />
+                            <span class="text-danger" asp-validation-for="DayObj.Date"></span>
+                        </div>
+                    </div>
+                }
+
+
+
+                <div class="form-group row">
+                    <div class="col-3">
+                        <label asp-for="DayObj.Hours"></label>
+                    </div>
+                    <div class="col-9">
+                        <input id="txtHours" class="form-control" asp-for="DayObj.Hours" />
+                        <span class="text-danger" asp-validation-for="DayObj.Hours"></span>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <div class="col-9 offset-3">
+                        <div class="row">
+                            <div class="col-6">
+                                <button type="submit" id="btnPlaceOrder" onclick="return validateInput()" value="Add Day" class="btn btn-primary form-control">
+                                    @(Model.DayObj.Id != 0 ? "Update" : "Add")
+                                </button>
+                                @*<button type="submit" onclick="return validateInput()" class="btn btn-primary form-control">@(Model.DayObj.Id != 0 ? "Update" : "Add")</button>*@
+                            </div>
+                            <div class="col-6">
+                                <a asp-page="./Details" asp-route-id="@Model.DayObj.TaskId" class="btn btn-success form-control">Back to List</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts{
+
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+
+        $(function () {
+            $("#datepicker").datepicker({
+                dateFormat: 'dd.MM.yy',
+                changeMonth: true,
+                changeYear: true
+            });
+        });
+
+    </script>
+
+    <script>
+        function validateInput() {
+            var rd = document.getElementById("requestdate").value;
+            var dt = document.getElementById("datepicker").value;
+            var hours = document.getElementById("txtHours").value;
+
+            d1 = Date.parse(dt.toString());
+            d2 = Date.parse(rd.toString());
+
+            if (d1 > d2) {
+                swal("Error", "Worked day should not exceed a requested date", "error");
+                return false;
+            }
+
+            if (hours == 0) {
+                swal("Error", "Hours should be greater than zero !", "error");
+                return false;
+            }
+            return true;
+        }
+    </script>
+}

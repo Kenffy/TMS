@@ -1,0 +1,162 @@
+﻿@page
+@model TMS.Pages.Admin.Report.IndexModel
+
+
+<div class="">
+    <form method="post">
+        <input type="hidden" asp-for="ReportObj.Tasks"/>
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="container backgroundWhite">
+            <div class="card">
+                <div class="card-header bg-light text-light ml-0 row container">
+                    <div class="col-12 col-md-6">
+                        <h3 class="text-secondary"><strong>Reports</strong></h3>
+                    </div>
+                    <div class="col-12 col-md-6 text-md-right">
+                        <button type="submit" asp-page-handler="Print" class="btn btn-warning form-control text-white" style="cursor:pointer; width:100px;">
+                            Print
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="container rounded p-2">
+                        <div class="row">
+                            <div class="col-12 col-lg-8">
+                                <div class="row">
+
+                                    <div class="col-12">
+
+                                        <div class="form-group row">
+                                            <div class="col-3">
+                                                <label asp-for="ReportObj.CurrentDate"></label>
+                                            </div>
+                                            <div class="col-6">
+                                                <input class="form-control" asp-for="ReportObj.CurrentDate"/>
+                                                <span class="text-danger" asp-validation-for="ReportObj.CurrentDate"></span>
+                                            </div>
+                                            <div class="col-2 ml-0">
+                                                <button type="submit" class="btn btn-secondary form-control text-white" style="cursor:pointer; width:100px;">
+                                                    Search
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-footer">
+                    @if (Model.ReportObj.Tasks.Count() > 0)
+                    {
+                        <table class="table table-striped border">
+                            <tr class="table-secondary">
+                                <th>
+                                    <label>Name</label>
+                                </th>
+                                <th>
+                                    <label>Customer</label>
+                                </th>
+                                <th>
+                                    <label>Requested Date</label>
+                                </th>
+                                <th>
+                                    <label>Hours</label>
+                                </th>
+                                <th>
+                                    <label>Priority</label>
+                                </th>
+                                <th>
+                                    <label>Status</label>
+                                </th>
+                            </tr>
+                            @foreach (var item in Model.ReportObj.Tasks)
+                            {
+                                <tr>
+                                    <td>
+                                        @Html.DisplayFor(m => item.Name)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(m => item.Customer)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(m => item.RequestDate)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(m => item.TotalOfHours)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(m => item.Priority.Name)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(m => item.Status)
+                                    </td>
+                                </tr>
+                            }
+                        </table>
+                    }
+                    else
+                    {
+                        <p>No closed tasks available.</p>
+                    }
+
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+@section Scripts{
+
+
+<script>
+    var dataTable;
+
+    $(document).ready(function () {
+        loadList();
+    });
+
+    function loadList() {
+
+        var dt = document.getElementById("currentmonth").value;
+        dt = dt.toString();
+
+        dataTable = $('#DT_load').DataTable({
+            "ajax": {
+                "url": "/api/Report?date="+dt,
+                "type": "POST",
+                "datatype": "json"
+            },
+            "columns": [
+                { "data": "name", "width": "25%" },
+                { "data": "customer", "width": "20%" },
+                { "data": "requestDate", "width": "20%" },
+                { "data": "totalOfHours", "width": "10%" },
+                { "data": "priority.name", "width": "15%" },
+                { "data": "status", "width": "10%" }
+            ],
+            "language": {
+                "emptyTable": "no data found."
+            },
+            "width": "100%",
+            "order": [[2, "asc"]]
+        });
+        
+    }
+
+    $(function () {
+        $("#currentmonth").datepicker({
+            dateFormat: 'dd.MM.yy',
+            changeMonth: true,
+            changeYear: true
+        });
+    });
+</script>
+}
+

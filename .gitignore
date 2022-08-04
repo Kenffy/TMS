@@ -1,0 +1,8 @@
+*.dll
+obj
+.dtbcache
+.dtbcache.v2
+bin
+appsettings.json
+*.db
+*.rdb

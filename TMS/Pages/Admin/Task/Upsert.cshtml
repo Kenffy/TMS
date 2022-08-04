@@ -1,0 +1,124 @@
+﻿@page
+@model TMS.Pages.Admin.Task.UpsertModel
+
+<form method="post" asp-action="Upsert">
+    <div class="container">
+        <div class="row px-2 mx-2 backgroundWhite border">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            @if (Model.TaskObj.Task.Id != 0)
+            {
+                <input type="hidden" asp-for="TaskObj.Task.Id" />
+            }
+
+            <div class="col-12 px-3" style="border-bottom:1px solid #325d88">
+                <h2 class="text-secondary">@(Model.TaskObj.Task.Id != 0 ? "Update" : "Create") Task</h2>
+            </div>
+
+            <div class="col-8 pt-3">
+
+                <div class="form-group row">
+                    <div class="col-3">
+                        <label asp-for="TaskObj.Task.Name"></label>
+                    </div>
+                    <div class="col-9">
+                        <input class="form-control" asp-for="TaskObj.Task.Name" />
+                        <span class="text-danger" asp-validation-for="TaskObj.Task.Name"></span>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <div class="col-3">
+                        <label asp-for="TaskObj.Task.Description"></label>
+                    </div>
+                    <div class="col-9">
+                        <textarea class="form-control" asp-for="TaskObj.Task.Description" id="txtDesc" style="height:80px;"></textarea>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <div class="col-3">
+                        <label asp-for="TaskObj.Task.RequestDate"></label>
+                    </div>
+                    <div class="col-9">
+                        <input class="form-control" id="datepicker" value="@Model.TaskObj.Task.RequestDate.ToShortDateString()" type="text" asp-for="TaskObj.Task.RequestDate" data-val="true"/>
+                        <span class="text-danger" asp-validation-for="TaskObj.Task.RequestDate"></span>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <div class="col-3">
+                        <label asp-for="TaskObj.Task.UserId"></label>
+                    </div>
+                    <div class="col-9">
+                        @Html.DropDownListFor(m => m.TaskObj.Task.UserId,
+                                                    Model.TaskObj.UserList,
+                                                    "- Assign to -",
+                                                    new { @class = "form-control" })
+                        <span class="text-danger" asp-validation-for="TaskObj.Task.UserId"></span>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <div class="col-3">
+                        <label asp-for="TaskObj.Task.Priority"></label>
+                    </div>
+                    <div class="col-9">
+                        @Html.DropDownListFor(m => m.TaskObj.Task.PriorityId,
+                                                    Model.TaskObj.Priorities,
+                                                    "- Select Priority -",
+                                                    new { @class = "form-control" })
+                        <span class="text-danger" asp-validation-for="TaskObj.Task.PriorityId"></span>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <div class="col-3">
+                        <label asp-for="TaskObj.Task.Customer"></label>
+                    </div>
+                    <div class="col-9">
+                        <input class="form-control" asp-for="TaskObj.Task.Customer" />
+                        <span class="text-danger" asp-validation-for="TaskObj.Task.Customer"></span>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <div class="col-9 offset-3">
+                        <div class="row">
+                            <div class="col-6">
+                                @*<button type="submit" class="btn btn-primary form-control">@(Model.TaskObj.Task.Id != 0 ? "Update" : "Create")</button>*@
+                                <button type="submit" id="btnPlaceOrder" onclick="return validateInput()" value="Place Order" class="btn btn-primary form-control">
+                                    @(Model.TaskObj.Task.Id != 0 ? "Update" : "Create")
+                                </button>
+                            </div>
+                            <div class="col-6">
+                                <a asp-page="./Index" class="btn btn-success form-control">Back to List</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts{
+
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        //tinymce.init({
+        //    selector: 'textarea',
+        //    plugins: "lists",
+        //    menubar: 'file edit format'
+        //});
+
+        $(function () {
+            $("#datepicker").datepicker({
+                dateFormat: 'dd.MM.yy',
+                changeMonth: true,
+                changeYear: true,
+                minDate: new Date()
+            });
+        })
+    </script>
+}
